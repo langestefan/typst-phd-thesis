@@ -1,4 +1,6 @@
-// A PhD thesis at Eindhoven University of Technology.
+// A PhD thesis at Eindhoven University of Technology. For another
+// university, use `plain-theme` with `institution: [...]` instead of
+// `rector`; it has English title and committee pages and no TU/e wording.
 // Compile with `typst watch main.typ`. Replace every red [placeholder].
 #import "@local/thesis-tue:0.1.0": *
 

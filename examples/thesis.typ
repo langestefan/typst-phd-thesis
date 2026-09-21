@@ -1,14 +1,19 @@
 // A short sample thesis about the template itself, shared by
-// examples/tue/main.typ and examples/plain/main.typ, which only pick the theme.
+// examples/tue/main.typ and examples/plain/main.typ. `kind` ("tue" or
+// "plain") picks the theme and the institution-specific details: the plain
+// version is a thesis at a fictional university, with no TU/e wording.
 #import "/src/lib.typ": *
 
-#let example-thesis(theme) = [
-  #show: theme.with(
+#let example-thesis(kind) = [
+  #let tue = kind == "tue"
+  #show: (if tue { tue-theme } else { plain-theme }).with(
     title: [Typesetting a Doctoral Thesis with Typst],
-    subtitle: [A template for Eindhoven University of Technology],
+    subtitle: if tue [A template for Eindhoven University of Technology] else [
+      A template for doctoral theses
+    ],
     author: "Jane Doe",
     full-name: [Jane Maria Doe],
-    birthplace: [Eindhoven],
+    birthplace: if tue [Eindhoven] else [Springfield],
     defense: datetime(
       year: 2026,
       month: 12,
@@ -17,7 +22,8 @@
       minute: 0,
       second: 0,
     ),
-    rector: [prof.dr. S.K. Lenaerts],
+    rector: if tue [prof.dr. S.K. Lenaerts],
+    ..if not tue { (institution: [Example University]) },
     keywords: ("typst", "thesis"),
     publications-bib: read("publications.bib"),
   )
@@ -33,14 +39,15 @@
     ),
   )
   #colophon(
-    isbn: "978-90-386-0000-0",
+    isbn: if tue { "978-90-386-0000-0" } else { "978-0-000-00000-0" },
     cover: [Jane Doe],
     printed-by: [Example Print],
   )
   #summary[
-    This thesis shows the `thesis-tue` template. It sets a two-sided book in
-    170 × 240 mm with chapters on recto pages, running headers, per-chapter
-    numbering and the front and back matter of a TU/e doctorate.
+    This thesis shows the `thesis-tue` template#if not tue [ in its plain
+      theme]. It sets a two-sided book in 170 × 240 mm with chapters on recto
+    pages, running headers, per-chapter numbering and the front and back
+    matter of a #if tue [TU/e] doctorate.
   ]
   #contents()
   #list-of-figures()
@@ -99,9 +106,9 @@
 
   #show: back-matter
   #bibliography("refs.bib")
-  #samenvatting[
-    Dit proefschrift laat het `thesis-tue` sjabloon zien.
-  ]
+  #if tue {
+    samenvatting[Dit proefschrift laat het `thesis-tue` sjabloon zien.]
+  }
   #acknowledgements[#lorem(60)]
   #curriculum-vitae(born: datetime(year: 1990, month: 5, day: 17))[#lorem(50)]
   #publications()
