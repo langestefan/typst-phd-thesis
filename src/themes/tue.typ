@@ -1,7 +1,8 @@
 // ============================================================================
-//  TU/e theme: Eindhoven University of Technology house colours, sans-serif
-//  headings with red chapter numbers, and the Dutch doctorate title and
-//  committee pages.
+//  TU/e theme: the classic TU/e thesis look. Charter throughout, chapters as
+//  "1 | Introduction", bold running heads with the page number behind a
+//  thick bar, and the Dutch doctorate title and committee pages. The layout
+//  is black and white; `tue-red` colours only `accent` and `highlight-box`.
 // ============================================================================
 
 #import "../core.typ": thesis
@@ -17,7 +18,7 @@
   ink: tue-ink,
   muted: tue-grey,
   rule: tue-grey.lighten(50%),
-  link: tue-red,
+  link: tue-ink,
 )
 
 // The TU/e logo in any colour. The SVG uses a single fill, so recolouring is
@@ -34,17 +35,18 @@
 }
 
 /// The TU/e thesis. Takes every `thesis` option (see core.typ) and passes
-/// the document body through `args`; `colors`
-/// overrides palette entries, e.g. `(primary: blue)`.
+/// the document body through `args`; `colors` overrides palette entries,
+/// e.g. `(primary: blue)`. The font is XCharter (free Charter, on CTAN; see
+/// scripts/get-fonts.sh); without it Typst warns once and uses Libertinus.
 #let tue-theme(
-  heading-font: ("Noto Sans", "Liberation Sans", "DejaVu Sans"),
+  font: ("XCharter", "Libertinus Serif"),
   institution: [Eindhoven University of Technology],
   colors: (:),
   ..args,
 ) = thesis(
   kind: "tue",
   palette: tue-palette + colors,
-  heading-font: heading-font,
+  font: font,
   institution: institution,
   ..args,
 )

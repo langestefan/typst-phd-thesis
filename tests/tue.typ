@@ -19,18 +19,22 @@
   rector: [prof.dr. S.K. Lenaerts],
 )
 
-#half-title()
-#colophon(
-  isbn: "978-90-386-0000-0",
-  printed-by: [Example Print],
-  funding: [This work was funded by an example grant.],
-)
 #title-page()
 #committee-page(
   chair: [prof.dr.ir. A. Chair],
   promotors: ([prof.dr.ir. B. First], [prof.dr. C. Second]),
   copromotors: [dr.ir. D. Co],
-  members: ([prof.dr. E. Member (University of Example)], [dr. F. Member]),
+  members: (
+    ([prof.dr. E. Member], [University of Example]),
+    ([dr. F. Member], [Example Institute]),
+    [prof.dr.ir. G. Member],
+  ),
+)
+#colophon(
+  isbn: "978-90-386-0000-0",
+  printed-by: [Example Print],
+  cover: [Jane Doe],
+  funding: [This work was funded by an example grant.],
 )
 #summary[#lorem(100)]
 #contents()

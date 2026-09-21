@@ -32,11 +32,15 @@ jobs:
         with:
           typst-version: ${{ matrix.typst }}
 
-      # Noto Sans is the TU/e heading font; poppler provides pdfinfo.
-      - name: Install fonts and poppler
+      # poppler provides pdfinfo and pdftoppm for check.sh.
+      - name: Install poppler
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends fonts-noto-core poppler-utils
+          sudo apt-get install -y --no-install-recommends poppler-utils
+
+      # XCharter, the TU/e theme's font, into tmp/fonts (check.sh uses it).
+      - name: Fetch fonts
+        run: scripts/get-fonts.sh
 
       # template/main.typ imports the package as @local/thesis-tue.
       - name: Install package as @local/thesis-tue
@@ -53,7 +57,7 @@ jobs:
         run: |
           version=$(sed -n 's/^version = "\(.*\)"/\1/p' typst.toml)
           typst init "@local/thesis-tue:$version" "$RUNNER_TEMP/thesis"
-          typst compile "$RUNNER_TEMP/thesis/main.typ"
+          typst compile --font-path tmp/fonts "$RUNNER_TEMP/thesis/main.typ"
 
       - name: Upload PDFs
         if: always() && matrix.typst == 'latest'

@@ -15,19 +15,22 @@
 )
 
 // ---- Front matter: numbered i, ii, ... -------------------------------------
-#half-title()
-#colophon(
-  isbn: none, // "978-90-386-xxxx-x", from the TU/e library
-  printed-by: none,
-  cover: none,
-  funding: none, // [This work is part of the project ..., funded by ...]
-)
 #title-page()
 #committee-page(
   chair: [prof.dr.ir. A. Voorzitter],
   promotors: ([prof.dr.ir. B. Promotor],),
   copromotors: ([dr.ir. C. Copromotor],),
-  members: ([prof.dr. D. Lid (University of Example)], [dr. E. Lid]),
+  // A member with an affiliation is a (name, affiliation) pair.
+  members: (
+    ([prof.dr. D. Lid], [University of Example]),
+    [dr. E. Lid],
+  ),
+)
+#colophon(
+  isbn: none, // "978-90-386-xxxx-x", from the TU/e library
+  cover: none,
+  printed-by: none,
+  funding: none, // [This work is part of the project ..., funded by ...]
 )
 #summary(include "chapters/summary.typ")
 #contents()

@@ -47,13 +47,15 @@
 
 // ---- Numbering --------------------------------------------------------------
 
-// Call in context. The chapter number for figure and equation labels, as
-// `numbering` pattern arguments: "3" in the main matter, "A" in appendices,
-// none before the first chapter.
-#let _in-chapter(n, pattern) = {
-  let ch = counter(heading).get().first()
+// Call in context. A figure or equation number within its chapter: "3.2"
+// in the main matter, "A.2" in appendices, just "2" before the first
+// chapter. `loc` is where to read the chapter; auto means here, which is
+// right for the numbering itself but not for lists of figures.
+#let _in-chapter(n, pattern, loc: auto) = {
+  let at = if loc == auto { here() } else { loc }
+  let ch = counter(heading).at(at).first()
   if ch == 0 { return numbering(pattern.replace("1.", ""), n) }
-  let p = if thesis-appendix.get() { pattern.replace("1.", "A.") } else {
+  let p = if thesis-appendix.at(at) { pattern.replace("1.", "A.") } else {
     pattern
   }
   numbering(p, ch, n)
@@ -68,29 +70,72 @@
   [#n#h(1em)#hd.body]
 }
 
-// Verso pages show the chapter, recto pages the current section.
-#let _header(cfg) = context {
-  let p = here().page()
-  if _bare-page(p) { return }
+// Call in context. The chapter running on page `p` and, on recto pages, the
+// section to name there: the first one starting on the page, else the last
+// one before it. None on pages without a running header.
+#let _marks(p) = {
   let chapters = query(heading.where(level: 1))
-  if chapters.any(h => h.location().page() == p) { return }
+  if chapters.any(h => h.location().page() == p) { return none }
   let before = chapters.filter(h => h.location().page() < p)
-  if before.len() == 0 { return }
+  if before.len() == 0 { return none }
   let chapter = before.last()
-
-  let mark = _mark(chapter)
+  let section = none
   if calc.odd(p) {
     let secs = query(heading.where(level: 2).after(chapter.location())).filter(
       s => s.location().page() <= p,
     )
     let here-secs = secs.filter(s => s.location().page() == p)
-    if here-secs.len() > 0 { mark = _mark(here-secs.first()) } else if (
+    if here-secs.len() > 0 { section = here-secs.first() } else if (
       secs.len() > 0
-    ) { mark = _mark(secs.last()) }
+    ) { section = secs.last() }
   }
+  (chapter: chapter, section: section)
+}
 
+// TU/e: the page number and a bold mark, split by a thick bar, over a rule.
+// Numbered chapters show the chapter title on verso pages and the section
+// on recto pages; unnumbered ones (Contents, Summary, ...) their title in
+// capitals.
+#let _header-tue(cfg, p, m) = {
+  let ch = m.chapter
+  let mark = if ch.numbering == none { upper(ch.body) } else if (
+    calc.odd(p) and m.section != none
+  ) { _mark(m.section) } else { ch.body }
+  let num = counter(page).display()
+  let bar = box(
+    width: 2pt,
+    height: 1em,
+    fill: cfg.palette.ink,
+    outset: (top: 2pt, bottom: 3pt),
+  )
+  set text(weight: "bold")
+  block(
+    width: 100%,
+    stroke: (bottom: 0.5pt + cfg.palette.ink),
+    inset: (bottom: 3pt),
+    if calc.even(p) {
+      grid(
+        columns: (auto, auto, 1fr),
+        column-gutter: 0.35em,
+        num, bar, mark,
+      )
+    } else {
+      grid(
+        columns: (1fr, auto, auto),
+        column-gutter: 0.35em,
+        mark, bar, num,
+      )
+    },
+  )
+}
+
+// Plain: a muted mark in the outer corner over a hairline; the page number
+// goes in the footer.
+#let _header-plain(cfg, p, m) = {
+  let mark = if m.section != none { _mark(m.section) } else {
+    _mark(m.chapter)
+  }
   set text(size: 0.85em, fill: cfg.palette.muted)
-  set par(first-line-indent: 0pt, justify: false)
   block(
     width: 100%,
     stroke: (bottom: 0.4pt + cfg.palette.rule),
@@ -99,12 +144,25 @@
   )
 }
 
-// The page number in the outer corner; in draft mode also a centred stamp.
+#let _header(cfg) = context {
+  let p = here().page()
+  if _bare-page(p) { return }
+  let m = _marks(p)
+  if m == none { return }
+  set par(first-line-indent: 0pt, justify: false)
+  if cfg.kind == "tue" { _header-tue(cfg, p, m) } else {
+    _header-plain(cfg, p, m)
+  }
+}
+
+// Plain: the page number in the outer corner. TU/e: nothing, the number is
+// in the header (and chapter openers carry none). Draft mode adds a centred
+// date stamp.
 #let _footer(cfg, draft) = context {
   let p = here().page()
   if _bare-page(p) { return }
   set text(size: 0.85em)
-  let num = counter(page).display()
+  let num = if cfg.kind != "tue" { counter(page).display() }
   let stamp = if draft {
     text(fill: cfg.palette.muted, [#term("draft", text.lang) --- #(
         datetime.today().display()
@@ -123,42 +181,67 @@
   }
 }
 
-// ---- Chapter openers ------------------------------------------------------------
+// ---- Headings ------------------------------------------------------------------
 
 #let _chapter-opener(it, cfg) = {
   let p = cfg.palette
-  let hfont = cfg.heading-font
   set par(first-line-indent: 0pt, justify: false)
+  set text(font: cfg.heading-font)
   let number = if it.numbering != none {
     counter(heading).display(it.numbering)
   }
-  block(width: 100%, above: 0pt, below: 3em, {
-    v(1.5cm)
-    if cfg.kind == "tue" {
+  if cfg.kind == "tue" {
+    // "1 | Introduction", bold, a third of the way down the text block.
+    block(width: 100%, above: 0pt, below: 3.5em, {
+      v(2.2cm)
+      set text(size: 2.2em, weight: "bold", fill: p.ink)
       if number != none {
-        text(
-          font: hfont,
-          size: 0.9em,
-          weight: "bold",
-          tracking: 0.12em,
-          fill: p.muted,
-          upper(it.supplement),
+        grid(
+          columns: (auto, auto, 1fr),
+          column-gutter: 0.45em,
+          number,
+          text(weight: "regular", fill: p.muted.lighten(30%))[|],
+          it.body,
         )
-        v(0.2em)
-        text(font: hfont, size: 5em, weight: "bold", fill: p.primary, number)
-        v(0.6em)
-      }
-      text(font: hfont, size: 2em, weight: "bold", fill: p.ink, it.body)
-      v(0.6em)
-      line(length: 2.5cm, stroke: 2pt + p.primary)
-    } else {
+      } else { it.body }
+    })
+  } else {
+    block(width: 100%, above: 0pt, below: 3em, {
+      v(1.5cm)
       if number != none {
         text(size: 1.3em, fill: p.muted, smallcaps[#it.supplement #number])
         v(0.6em)
       }
-      text(font: hfont, size: 2.2em, fill: p.ink, it.body)
+      text(size: 2.2em, fill: p.ink, it.body)
       v(0.3em)
       line(length: 100%, stroke: 0.5pt + p.rule)
+    })
+  }
+}
+
+// A numbered section heading: the number in its own column, so a long
+// title wraps under the title rather than under the number.
+#let _section(it) = {
+  if it.numbering == none { return it }
+  block(grid(
+    columns: (auto, 1fr),
+    column-gutter: 1em,
+    counter(heading).display(it.numbering), it.body,
+  ))
+}
+
+// A caption: centred when it fits on one line, otherwise with the
+// "Figure 1.2:" label hanging to the left of the text.
+#let _caption(it) = context {
+  if it.numbering == none { return it }
+  let lbl = [#it.supplement #it.counter.display(it.numbering)#it.separator]
+  layout(size => {
+    let one = [#lbl#it.body]
+    if measure(one).width <= size.width { align(center, one) } else {
+      align(left, grid(
+        columns: (auto, 1fr),
+        lbl, it.body,
+      ))
     }
   })
 }
@@ -254,10 +337,15 @@
     counter(math.equation).update(0)
     _chapter-opener(it, cfg)
   }
-  show heading.where(level: 2): set text(size: 1.25em, weight: "bold")
+  let (size-2, size-3) = if kind == "tue" { (1.4em, 1.15em) } else {
+    (1.25em, 1.05em)
+  }
+  show heading.where(level: 2): set text(size: size-2, weight: "bold")
   show heading.where(level: 2): set block(above: 2em, below: 1em)
-  show heading.where(level: 3): set text(size: 1.05em, weight: "bold")
+  show heading.where(level: 3): set text(size: size-3, weight: "bold")
   show heading.where(level: 3): set block(above: 1.6em, below: 0.8em)
+  show heading.where(level: 2): _section
+  show heading.where(level: 3): _section
   show heading.where(level: 4): set text(
     size: 1em,
     weight: "bold",
@@ -271,6 +359,7 @@
   show figure.where(kind: table): set figure.caption(position: top)
   show figure.caption: set text(size: 0.9em)
   show figure.caption: set par(justify: false)
+  show figure.caption: _caption
   set table(stroke: (_, y) => if y == 0 { (bottom: 0.6pt + pal.ink) })
 
   set outline(indent: auto)

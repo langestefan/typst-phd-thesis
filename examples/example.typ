@@ -25,14 +25,20 @@
   keywords: ("typst", "thesis"),
 )
 
-#half-title()
-#colophon(isbn: "978-90-386-0000-0", printed-by: [Example Print])
 #title-page()
 #committee-page(
   chair: [prof.dr.ir. A. Chair],
   promotors: ([prof.dr.ir. B. First],),
   copromotors: ([dr.ir. C. Co],),
-  members: ([prof.dr. D. Member (University of Example)], [dr. E. Member]),
+  members: (
+    ([prof.dr. D. Member], [University of Example]),
+    [dr. E. Member],
+  ),
+)
+#colophon(
+  isbn: "978-90-386-0000-0",
+  cover: [Jane Doe],
+  printed-by: [Example Print],
 )
 #summary[
   This thesis shows the `thesis-tue` template. It sets a two-sided book in

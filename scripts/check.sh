@@ -11,6 +11,9 @@ cd "$(dirname "$0")/.." || exit 1
 
 # Override the compiler with TYPST=/path/to/typst (CI tests several versions).
 TYPST="${TYPST:-typst}"
+# Fonts fetched by scripts/get-fonts.sh (XCharter for the TU/e theme).
+fonts=()
+[ -d tmp/fonts ] && fonts=(--font-path tmp/fonts)
 out=tmp/check
 rm -rf "$out"; mkdir -p "$out"
 pass=0
@@ -22,7 +25,7 @@ compile() {
   shift 2
   name=$(basename "$(dirname "$src")")-$(basename "$src" .typ)$suffix
   local log="$out/$name.log"
-  if "$TYPST" compile --root . "$@" "$src" "$out/$name.pdf" >"$log" 2>&1 && ! grep -qE '^(warning|error)' "$log"; then
+  if "$TYPST" compile --root . "${fonts[@]}" "$@" "$src" "$out/$name.pdf" >"$log" 2>&1 && ! grep -qE '^(warning|error)' "$log"; then
     printf '  ok    %-24s %s pages\n' "$name" "$(pdfinfo "$out/$name.pdf" 2>/dev/null | awk '/^Pages/ {print $2}')"
     pass=$((pass + 1))
     if [ "$NO_PNG" = 0 ]; then

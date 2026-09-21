@@ -45,7 +45,10 @@
   === Details
   #lorem(150)
 
-  #figure(rect(width: 50%, height: 2cm), caption: [Another figure.])
+  #figure(
+    rect(width: 50%, height: 2cm),
+    caption: [Another figure, with a caption long enough to wrap onto a second line so that the label hangs to its left.],
+  )
 
   #show: appendix
   = Derivations <app:deriv>

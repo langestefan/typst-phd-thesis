@@ -8,7 +8,7 @@ A PhD thesis template for [Typst](https://typst.app): a two-sided book in the
 
 | Theme         | Look                                                              |
 | ------------- | ----------------------------------------------------------------- |
-| `tue-theme`   | TU Eindhoven: red chapter numbers, sans headings, Dutch doctorate pages |
+| `tue-theme`   | Classic TU/e thesis: Charter, `1 \| Introduction` chapters, bold running heads with the page number behind a bar, Dutch doctorate pages |
 | `plain-theme` | Neutral: serif throughout, English title and committee pages      |
 
 ## Install
@@ -25,6 +25,12 @@ Windows (PowerShell):
 
 ```powershell
 git clone https://github.com/langestefan/typst-phd-thesis.git "$env:APPDATA\typst\packages\local\thesis-tue\0.1.0"
+```
+
+The TU/e theme is set in [XCharter](https://ctan.org/pkg/xcharter), the free extension of Bitstream Charter. Install it once (without it Typst warns and falls back to Libertinus Serif):
+
+```bash
+scripts/get-fonts.sh ~/.local/share/fonts     # Linux; on Windows install the .otf files from CTAN
 ```
 
 To update, run `git pull` in that folder. Then start a thesis from the template:
@@ -49,11 +55,13 @@ cd my-thesis && typst watch main.typ
 )
 
 // Front matter, numbered i, ii, ...
-#half-title()
-#colophon(isbn: "978-90-386-xxxx-x", printed-by: [Printer])
-#title-page()
-#committee-page(chair: [...], promotors: ([...],), copromotors: ([...],), members: ([...], [...]))
-#summary[...]
+#title-page()                       // recto
+#committee-page(                    // its verso
+  chair: [...], promotors: ([...],), copromotors: ([...],),
+  members: (([prof.dr. A. Jansen], [TU Delft]), [dr. B. de Vries]),  // (name, affiliation) or name
+)
+#colophon(isbn: "978-90-386-xxxx-x", cover: [...], printed-by: [...])  // next verso
+#summary[...]                       // repeats the thesis title in bold (tue)
 #contents()
 
 #show: main-matter      // recto page 1, numbered chapters
@@ -77,7 +85,8 @@ date, birthplace) shows as a red `[placeholder]`.
 ### Layout
 
 - Chapters open on recto pages. A blank verso page before a chapter has no header and no page number.
-- Running headers: the chapter on verso pages, the current section on recto pages. None on chapter openers.
+- Running headers: the chapter on verso pages, the current section on recto pages; unnumbered chapters (Contents, Summary, ...) in capitals. None on chapter openers. The TU/e theme puts the page number in the header, next to a thick bar, and has no footer; the plain theme numbers pages in the footer.
+- Captions are centred when they fit on one line; longer ones hang after the "Figure 1.2:" label. Lists of figures and tables show the number only and leave a gap between chapters.
 - Figures, tables and equations are numbered per chapter (`2.3`, `(2.3)`); appendices use letters (`A.1`). Table captions go above the table.
 - Front matter is numbered `i, ii, ...`; the main matter restarts at 1 on a recto page.
 
@@ -100,8 +109,8 @@ Both themes accept these options, passed through to `thesis` in `src/core.typ`:
 | `lang`          | `"en"`                           | `"nl"` for a Dutch thesis: Dutch fixed terms and hyphenation |
 | `paper`         | `(170mm, 240mm)`                 | page width and height                                     |
 | `margin`        | inside 24, outside 20, top 24, bottom 24 mm | two-sided margins                              |
-| `font`          | Libertinus Serif                 | body font (ships with Typst)                              |
-| `heading-font`  | Noto Sans chain (tue), `font` (plain) | chapter and section titles                           |
+| `font`          | XCharter (tue), Libertinus Serif (plain) | body font                                         |
+| `heading-font`  | `auto` (= `font`)                | chapter and section titles                                |
 | `math-font`     | New Computer Modern Math         |                                                           |
 | `text-size`     | `10pt`                           |                                                           |
 | `justify`       | `true`                           |                                                           |
@@ -112,11 +121,11 @@ Both themes accept these options, passed through to `thesis` in `src/core.typ`:
 
 | Function                                    | Purpose                                                  |
 | ------------------------------------------- | -------------------------------------------------------- |
-| `half-title()`                              | recto page with the title only                           |
-| `colophon(isbn:, printed-by:, cover:, funding:, catalogue:, copyright:, note:)` | verso page, set at the foot |
 | `title-page()`                              | TU/e: the Dutch *proefschrift* page. Plain: English      |
-| `committee-page(chair:, promotors:, copromotors:, members:, advisors:, statement:)` | verso of the title page. TU/e adds the *Gedragscode* statement |
-| `summary(lang:, title:)[...]`, `samenvatting[...]` | unnumbered chapter, English or Dutch              |
+| `committee-page(chair:, promotors:, copromotors:, members:, advisors:, statement:)` | verso of the title page; a person is a name or a (name, affiliation) pair. TU/e adds the *Gedragscode* statement |
+| `colophon(isbn:, printed-by:, cover:, funding:, catalogue:, copyright:, note:)` | verso page, set at the foot |
+| `half-title()`                              | optional recto page with the title only                  |
+| `summary(lang:, title:, show-title:)[...]`, `samenvatting[...]` | unnumbered chapter, English or Dutch |
 | `contents(depth:)`, `list-of-figures()`, `list-of-tables()` | outlines                                 |
 | `front-matter`, `main-matter`, `appendix`, `back-matter` | `#show:` switches                           |
 | `acknowledgements[...]`                     | unnumbered chapter ("Dankwoord" in Dutch)                |
@@ -136,7 +145,7 @@ Both themes accept these options, passed through to `thesis` in `src/core.typ`:
 `examples/example.typ` is a short thesis about the template itself.
 
 ```bash
-typst compile --root . examples/example.typ tue.pdf
+typst compile --root . --font-path tmp/fonts examples/example.typ tue.pdf
 typst compile --root . --input theme=plain examples/example.typ plain.pdf
 ```
 
@@ -150,6 +159,6 @@ scripts/check.sh --no-png
 Requirements:
 - Typst 0.14 or newer. CI tests 0.14.2 and the latest release.
 - `pdfinfo` and `pdftoppm` (poppler) for `check.sh`.
-- The Noto Sans font for the TU/e headings (falls back to Liberation Sans or DejaVu Sans).
+- XCharter: `scripts/get-fonts.sh` puts it in `tmp/fonts`, which `check.sh` passes to Typst.
 
 The TU/e logo in `assets/` is a trademark of Eindhoven University of Technology. The MIT licence covers the code, not the logo.

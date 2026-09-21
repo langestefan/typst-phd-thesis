@@ -17,6 +17,7 @@
   ),
 )
 
+#half-title()
 #title-page()
 #committee-page(
   chair: [Prof. A. Chair],
