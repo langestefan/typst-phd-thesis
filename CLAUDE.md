@@ -4,7 +4,7 @@ This file guides Claude Code (claude.ai/code) when working in this repository.
 
 ## What this is
 
-`thesis-tue` is a Typst PhD thesis package (`@local/thesis-tue:0.1.0`, entrypoint `src/lib.typ`) with two themes, `tue-theme` and `plain-theme`. Its one `@preview` dependency is `alexandria` 0.2.2, for the second (own-publications) bibliography. It is installed by symlinking the repo to `~/.local/share/typst/packages/local/thesis-tue/0.1.0`. `template/` is what `typst init` copies. Sibling project with the same conventions: `../typst-beamer-tue`.
+`thesis-tue` is a Typst PhD thesis package (`@local/thesis-tue:0.1.0`, entrypoint `src/lib.typ`) with two themes, `tue-theme` and `plain-theme`. Its one `@preview` dependency is `alexandria` 0.2.2, for the second (own-publications) bibliography. It is installed by symlinking the repo to `~/.local/share/typst/packages/local/thesis-tue/0.1.0`. `template/` is what `typst init` copies. `examples/tue/` and `examples/plain/` hold the example thesis (`examples/thesis.typ`) in each theme with its PDF, which is committed: rebuild it (`typst compile --root . --font-path tmp/fonts examples/<theme>/main.typ`) whenever the output changes. Sibling project with the same conventions: `../typst-beamer-tue`.
 
 ```bash
 scripts/get-fonts.sh                      # once: XCharter (TU/e theme font) into tmp/fonts

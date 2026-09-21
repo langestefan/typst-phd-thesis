@@ -150,11 +150,11 @@ Both themes accept these options, passed through to `thesis` in `src/core.typ`:
 
 ## Example
 
-`examples/example.typ` is a short thesis about the template itself.
+A short thesis about the template itself, in both themes: [`examples/tue/main.pdf`](examples/tue/main.pdf) and [`examples/plain/main.pdf`](examples/plain/main.pdf). The text is in `examples/thesis.typ`; each `main.typ` only picks the theme. To rebuild the PDFs:
 
 ```bash
-typst compile --root . --font-path tmp/fonts examples/example.typ tue.pdf
-typst compile --root . --input theme=plain examples/example.typ plain.pdf
+typst compile --root . --font-path tmp/fonts examples/tue/main.typ
+typst compile --root . examples/plain/main.typ
 ```
 
 ## Development

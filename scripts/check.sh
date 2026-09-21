@@ -39,11 +39,10 @@ compile() {
 
 NO_PNG=0
 [ "${1:-}" = "--no-png" ] && NO_PNG=1
-for f in tests/tue.typ tests/plain.typ tests/features.typ template/main.typ; do
+for f in tests/tue.typ tests/plain.typ tests/features.typ template/main.typ \
+  examples/tue/main.typ examples/plain/main.typ; do
   compile "$f" ""
 done
-compile examples/example.typ "-tue" --input theme=tue
-compile examples/example.typ "-plain" --input theme=plain
 
 echo "$pass passed, $fail failed"
 [ "$fail" -eq 0 ]
