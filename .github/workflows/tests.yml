@@ -1,0 +1,66 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Cancel superseded PR runs so a force-push doesn't queue up duplicate work,
+# but let main-branch runs complete in order.
+concurrency:
+  group: tests-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  typst:
+    name: Typst ${{ matrix.typst }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Oldest supported compiler (typst.toml `compiler`) and the newest.
+        typst: ["0.14.2", "latest"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Typst
+        uses: typst-community/setup-typst@v4
+        with:
+          typst-version: ${{ matrix.typst }}
+
+      # Noto Sans is the TU/e heading font; poppler provides pdfinfo.
+      - name: Install fonts and poppler
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends fonts-noto-core poppler-utils
+
+      # template/main.typ imports the package as @local/thesis-tue.
+      - name: Install package as @local/thesis-tue
+        run: |
+          version=$(sed -n 's/^version = "\(.*\)"/\1/p' typst.toml)
+          dir="${XDG_DATA_HOME:-$HOME/.local/share}/typst/packages/local/thesis-tue"
+          mkdir -p "$dir"
+          ln -s "$GITHUB_WORKSPACE" "$dir/$version"
+
+      - name: Compile tests, template and example
+        run: scripts/check.sh --no-png
+
+      - name: typst init smoke test
+        run: |
+          version=$(sed -n 's/^version = "\(.*\)"/\1/p' typst.toml)
+          typst init "@local/thesis-tue:$version" "$RUNNER_TEMP/thesis"
+          typst compile "$RUNNER_TEMP/thesis/main.typ"
+
+      - name: Upload PDFs
+        if: always() && matrix.typst == 'latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: thesis
+          path: |
+            tmp/check/*.pdf
+            tmp/check/*.log
+          retention-days: 14
