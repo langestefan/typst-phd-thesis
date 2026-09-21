@@ -1,0 +1,16 @@
+[package]
+name = "thesis-tue"
+version = "0.1.0"
+entrypoint = "src/lib.typ"
+authors = ["Stefan de Lange"]
+description = "PhD thesis template: a TU Eindhoven theme with the Dutch doctorate front matter, and a plain theme."
+license = "MIT"
+keywords = ["thesis", "phd", "dissertation", "proefschrift", "tue", "eindhoven"]
+categories = ["thesis"]
+compiler = "0.14.0"
+exclude = ["tests", "scripts", "examples", "tmp", "CLAUDE.md"]
+
+# Publishing as a template package is what makes `typst init` work.
+[template]
+path = "template"
+entrypoint = "main.typ"
