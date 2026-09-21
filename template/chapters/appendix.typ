@@ -1,0 +1,3 @@
+= Supplementary material
+
+Appendices are numbered A, B, ...; their figures A.1, A.2, ...
