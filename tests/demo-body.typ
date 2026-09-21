@@ -17,13 +17,18 @@
 
   #figure(
     rect(width: 60%, height: 3cm),
+    alt: "An empty rectangle.",
     caption: [A placeholder figure.],
   ) <fig:grid>
 
   == Research questions
   #lorem(260)
 
-  $ P = V I cos phi $ <eq:power>
+  #math.equation(
+    block: true,
+    alt: "P equals V times I times cosine phi",
+    $P = V I cos phi$,
+  ) <eq:power>
 
   #lorem(300)
 
@@ -33,7 +38,7 @@
   #figure(
     table(
       columns: 3,
-      [Bus], [$V$ (pu)], [$P$ (kW)],
+      table.header([Bus], [Voltage (pu)], [Power (kW)]),
       [1], [1.00], [0],
       [2], [0.98], [12.5],
     ),
@@ -48,6 +53,7 @@
 
   #figure(
     rect(width: 50%, height: 2cm),
+    alt: "An empty rectangle.",
     caption: [Another figure, with a caption long enough to wrap onto a second line so that the label hangs to its left.],
   )
 
@@ -56,9 +62,10 @@
   #lorem(100)
   #figure(
     rect(width: 40%, height: 2cm),
+    alt: "An empty rectangle.",
     caption: [An appendix figure.],
   ) <fig:app>
-  $ x = 1 $
+  #math.equation(block: true, alt: "x equals 1", $x = 1$)
 
   #show: back-matter
   #bibliography("refs.bib")

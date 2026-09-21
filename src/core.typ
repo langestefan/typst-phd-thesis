@@ -201,7 +201,8 @@
           columns: (auto, auto, 1fr),
           column-gutter: 0.45em,
           number,
-          text(weight: "regular", fill: p.muted.lighten(30%))[|],
+          // Decorative: kept out of the tags, so screen readers skip it.
+          pdf.artifact(text(weight: "regular", fill: p.muted.lighten(30%))[|]),
           it.body,
         )
       } else { it.body }

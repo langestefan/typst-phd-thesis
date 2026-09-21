@@ -22,7 +22,8 @@
 )
 
 // The TU/e logo in any colour. The SVG uses a single fill, so recolouring is
-// a string replacement. `full: false` keeps only the "TU/e" letters.
+// a string replacement. `full: false` keeps only the "TU/e" letters. Pass
+// `alt` to replace the default alternative text.
 #let tue-logo(color: tue-red, full: true, ..args) = {
   let svg = read("../../assets/tue-logo.svg").replace("#c72125", color.to-hex())
   if not full {
@@ -31,7 +32,7 @@
       "viewBox=\"8.5 8.5 85.5 34.3\"",
     )
   }
-  image(bytes(svg), format: "svg", ..args)
+  image(bytes(svg), format: "svg", alt: "TU/e logo", ..args)
 }
 
 /// The TU/e thesis. Takes every `thesis` option (see core.typ) and passes

@@ -1,5 +1,6 @@
 #!/bin/bash
-# Compile every test thesis, the template and the example; fail on any error
+# Compile every test thesis, the template and the example as PDF/UA-1 (so
+# Typst enforces alt text, table structure and tagging); fail on any error
 # or warning. tests/features.typ holds `assert`s on numbering and page logic.
 # PDFs and PNG previews land in tmp/ (gitignored) for visual inspection.
 #
@@ -25,7 +26,7 @@ compile() {
   shift 2
   name=$(basename "$(dirname "$src")")-$(basename "$src" .typ)$suffix
   local log="$out/$name.log"
-  if "$TYPST" compile --root . "${fonts[@]}" "$@" "$src" "$out/$name.pdf" >"$log" 2>&1 && ! grep -qE '^(warning|error)' "$log"; then
+  if "$TYPST" compile --root . --pdf-standard ua-1 "${fonts[@]}" "$@" "$src" "$out/$name.pdf" >"$log" 2>&1 && ! grep -qE '^(warning|error)' "$log"; then
     printf '  ok    %-24s %s pages\n' "$name" "$(pdfinfo "$out/$name.pdf" 2>/dev/null | awk '/^Pages/ {print $2}')"
     pass=$((pass + 1))
     if [ "$NO_PNG" = 0 ]; then

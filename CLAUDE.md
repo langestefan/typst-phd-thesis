@@ -4,11 +4,11 @@ This file guides Claude Code (claude.ai/code) when working in this repository.
 
 ## What this is
 
-`thesis-tue` is a Typst PhD thesis package (`@local/thesis-tue:0.1.0`, entrypoint `src/lib.typ`) with two themes, `tue-theme` and `plain-theme`. Its one `@preview` dependency is `alexandria` 0.2.2, for the second (own-publications) bibliography. It is installed by symlinking the repo to `~/.local/share/typst/packages/local/thesis-tue/0.1.0`. `template/` is what `typst init` copies. `examples/tue/` and `examples/plain/` hold the example thesis (`examples/thesis.typ`) in each theme with its PDF, which is committed: rebuild it (`typst compile --root . --font-path tmp/fonts examples/<theme>/main.typ`) whenever the output changes. Sibling project with the same conventions: `../typst-beamer-tue`.
+`thesis-tue` is a Typst PhD thesis package (`@local/thesis-tue:0.1.0`, entrypoint `src/lib.typ`) with two themes, `tue-theme` and `plain-theme`. Its one `@preview` dependency is `alexandria` 0.2.2, for the second (own-publications) bibliography. It is installed by symlinking the repo to `~/.local/share/typst/packages/local/thesis-tue/0.1.0`. `template/` is what `typst init` copies. `examples/tue/` and `examples/plain/` hold the example thesis (`examples/thesis.typ`) in each theme with its PDF, which is committed: rebuild it (`typst compile --root . --font-path tmp/fonts --pdf-standard ua-1 examples/<theme>/main.typ`) whenever the output changes. Sibling project with the same conventions: `../typst-beamer-tue`.
 
 ```bash
 scripts/get-fonts.sh                      # once: XCharter (TU/e theme font) into tmp/fonts
-scripts/check.sh                          # compile tests, template and example; fail on any warning; PNGs in tmp/check/
+scripts/check.sh                          # compile tests, template and examples as PDF/UA-1; fail on any warning; PNGs in tmp/check/
 TYPST=/path/to/typst scripts/check.sh     # same, with another compiler version
 typstyle --check src tests template examples   # formatting, as enforced by CI
 ```
@@ -37,6 +37,8 @@ Keep the sources `typstyle`-clean. If you bump the pinned `typstyle`, reformat i
 - Own publications are a second bibliography via alexandria: `thesis` registers the `pub:` prefix (show rule) and loads `publications-bib` with `assets/ieee-publications.csl` (IEEE with `P` numbers, sorted by date; CC BY-SA, keep its header). `publications()` renders `get-bibliography` itself and must place a `label(prefix + key)` for every entry, or `@pub:key` citations fail with "label does not exist". The `.bib` contents come from the user's file (`read(...)` there), because `read` in the package resolves package-relative paths.
 - Themes pass the document body through `..args` to `thesis(...)`; do not turn them into `thesis.with(...)`, or `#show: tue-theme.with(...)` returns a function instead of content.
 - Typst on this machine cannot read or write `/tmp` (it has a private `/tmp`). Put scratch compiles under the repo's `tmp/`, which is gitignored.
+
+- `check.sh` compiles everything with `--pdf-standard ua-1`, so every equation and non-image figure in tests, template and examples needs `alt`, and tables need `table.header`. In the package: purely decorative marks go in `pdf.artifact` (headers, footers and shapes already are); the title page uses the `title` element (once per document, so the half-title is plain text), with its size resolved against the body text because `em` inside `show title` is relative to the title's own default size; lists of things (publications) are `terms`, not `grid`, so they are tagged as lists.
 
 ## Verification
 

@@ -86,21 +86,32 @@
     let by-key = (:)
     for e in bib.references { by-key.insert(e.key, e) }
 
-    // Label (for @pub:key links), [Pn] and the entry, with a hanging indent.
-    let entries(list) = grid(
-      columns: 2,
-      column-gutter: 0.65em,
-      row-gutter: 0.9em,
-      ..for e in list {
-        (
-          {
-            [#metadata(none)#label(prefix + e.key)]
-            if e.first-field != none { hayagriva.render(e.first-field) }
-          },
-          hayagriva.render(e.content),
-        )
-      },
-    )
+    // A term list (tagged as a list, like the main bibliography): the
+    // label for @pub:key links and [Pn] as the term, in a box as wide as
+    // the widest label, and the entry hanging after it.
+    let entries(list) = {
+      let labels = list.map(e => if e.first-field != none {
+        hayagriva.render(e.first-field)
+      } else { [] })
+      let w = calc.max(0pt, ..labels.map(l => measure(l).width))
+      let gap = 0.65em
+      set strong(delta: 0)
+      set par(first-line-indent: 0pt)
+      set terms(
+        tight: false,
+        spacing: 0.9em,
+        separator: h(gap),
+        hanging-indent: w + gap,
+      )
+      terms(
+        ..list
+          .zip(labels)
+          .map(((e, l)) => terms.item(
+            [#metadata(none)#label(prefix + e.key)#box(width: w, l)],
+            hayagriva.render(e.content),
+          )),
+      )
+    }
 
     if groups == auto {
       entries(bib.references)

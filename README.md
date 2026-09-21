@@ -87,6 +87,17 @@ Your own papers live in a second bibliography (via [alexandria](https://typst.ap
 Metadata that the title page needs but you have not given yet (rector, defence
 date, birthplace) shows as a red `[placeholder]`.
 
+### Accessible PDF
+
+Typst writes tagged PDFs, and the template keeps them clean: the title page uses Typst's `title` element, decorative marks (the `|` in chapter openers, running heads, rules) are artifacts that screen readers skip, and the list of publications is a real list. The template, tests and examples all pass PDF/UA-1. What only you can add is descriptions of your content:
+
+- `alt` on every image, `figure(image("plot.svg", alt: "..."))`, and on figures drawn without an image (CeTZ, shapes): `figure(..., alt: "...")`. A figure holding a table needs none.
+- `alt` on equations: `#math.equation(block: true, alt: "E equals m c squared", $E = m c^2$)`.
+- `table.header(...)` for header rows, and `table` rather than `grid` for data.
+- `alt` on the CV `photo` image.
+
+Export with `typst compile --pdf-standard ua-1 main.typ` and Typst refuses to write the PDF until nothing is missing, naming each spot. See Typst's [accessibility guide](https://typst.app/docs/guides/accessibility/).
+
 ### Layout
 
 - Chapters open on recto pages. A blank verso page before a chapter has no header and no page number.
@@ -153,14 +164,14 @@ Both themes accept these options, passed through to `thesis` in `src/core.typ`:
 A short thesis about the template itself, in both themes: [`examples/tue/main.pdf`](examples/tue/main.pdf) and [`examples/plain/main.pdf`](examples/plain/main.pdf). The text is in `examples/thesis.typ`; each `main.typ` only picks the theme. To rebuild the PDFs:
 
 ```bash
-typst compile --root . --font-path tmp/fonts examples/tue/main.typ
-typst compile --root . examples/plain/main.typ
+typst compile --root . --font-path tmp/fonts --pdf-standard ua-1 examples/tue/main.typ
+typst compile --root . --pdf-standard ua-1 examples/plain/main.typ
 ```
 
 ## Development
 
 ```bash
-scripts/check.sh          # compile tests/, template/ and examples/, fail on any warning, PNG previews in tmp/check/
+scripts/check.sh          # compile tests/, template/ and examples/ as PDF/UA-1, fail on any warning, PNG previews in tmp/check/
 scripts/check.sh --no-png
 ```
 

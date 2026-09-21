@@ -21,9 +21,24 @@
 // A visible stand-in for metadata the author has not filled in yet.
 #let _missing(what) = text(fill: red)[[#what]]
 
-#let _title-block(cfg, size: 1.9em) = {
+// The title and subtitle. On the title page (`semantic: true`) the title is
+// Typst's `title` element, which tags it as the document title in the PDF;
+// a document has exactly one, so the half-title sets plain text.
+#let _title-block(cfg, size: 1.9em, semantic: false) = {
   let i = cfg.info
-  text(font: cfg.heading-font, size: size, weight: "bold", i.title)
+  if semantic {
+    // `size` is relative to the body text, not to the title's own default
+    // size, so resolve it here (the callers run in `context`).
+    show title: set text(
+      font: cfg.heading-font,
+      size: size.abs + size.em * text.size,
+      weight: "bold",
+    )
+    show title: set block(above: 0pt, below: 0.6em)
+    title(i.title)
+  } else {
+    text(font: cfg.heading-font, size: size, weight: "bold", i.title)
+  }
   if i.subtitle != none {
     v(0.6em)
     text(size: 1.2em, i.subtitle)
@@ -50,7 +65,7 @@
   set text(lang: "nl")
   set align(center)
   v(4mm)
-  _title-block(cfg, size: 1.6em)
+  _title-block(cfg, size: 1.6em, semantic: true)
   v(2fr)
   [PROEFSCHRIFT]
   v(1.6fr)
@@ -81,7 +96,7 @@
   let i = cfg.info
   set align(center)
   v(6mm)
-  _title-block(cfg)
+  _title-block(cfg, semantic: true)
   v(1fr)
   [A thesis submitted for the degree of]
   v(0.4em)

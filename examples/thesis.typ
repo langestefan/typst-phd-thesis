@@ -61,12 +61,17 @@
   == Numbering
   Figures, tables and equations are numbered per chapter, so @fig:page is the
   first figure of this chapter and @eq:area its first equation:
-  $ A = w h = 170 "mm" times 240 "mm". $ <eq:area>
+  #math.equation(
+    block: true,
+    alt: "A equals w times h equals 170 millimetres times 240 millimetres",
+    $A = w h = 170 "mm" times 240 "mm".$,
+  ) <eq:area>
 
   #figure(
     rect(width: 50%, height: 3.5cm, stroke: 0.6pt)[#align(
       center + horizon,
     )[page]],
+    alt: "An outlined rectangle labelled page.",
     caption: [A page of 170 × 240 mm.],
   ) <fig:page>
 
@@ -80,7 +85,7 @@
   #figure(
     table(
       columns: 2,
-      [Margin], [Width],
+      table.header([Margin], [Width]),
       [Inside], [24 mm],
       [Outside], [20 mm],
       [Top], [24 mm],
