@@ -23,6 +23,7 @@
   ),
   rector: [prof.dr. S.K. Lenaerts],
   keywords: ("typst", "thesis"),
+  publications-bib: read("publications.bib"),
 )
 
 #title-page()
@@ -52,7 +53,9 @@
 
 = Introduction <ch:intro>
 A thesis is a book, and Typst @typst typesets one quickly. This chapter shows
-the body text; @ch:layout shows the page layout.
+the body text; @ch:layout shows the page layout. Your own papers
+@pub:doe2022early @pub:doe2024mid come from a second bibliography and are
+labelled P1, P2, ...
 
 == Chapters and sections
 Every level-one heading opens a chapter on a recto page. If the previous
@@ -100,4 +103,4 @@ Verso pages show the chapter, recto pages the current section. #lorem(250)
 ]
 #acknowledgements[#lorem(60)]
 #curriculum-vitae(born: datetime(year: 1990, month: 5, day: 17))[#lorem(50)]
-#publications(("doe2024journal", "doe2023conf"))
+#publications()

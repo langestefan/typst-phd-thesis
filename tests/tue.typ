@@ -6,6 +6,7 @@
   title: [Probabilistic Methods for Distribution Grids],
   subtitle: [A sample thesis],
   author: "Jane Doe",
+  publications-bib: read("publications.bib"),
   full-name: [Jane Maria Doe],
   birthplace: [Eindhoven],
   defense: datetime(

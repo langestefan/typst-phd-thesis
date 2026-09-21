@@ -52,6 +52,7 @@ cd my-thesis && typst watch main.typ
   birthplace: [Eindhoven],
   defense: datetime(year: 2027, month: 6, day: 1, hour: 16, minute: 0, second: 0),
   rector: [prof.dr. S.K. Lenaerts],       // check with the doctorate office
+  publications-bib: read("publications.bib"),  // your own papers, cited as @pub:key
 )
 
 // Front matter, numbered i, ii, ...
@@ -76,8 +77,12 @@ cd my-thesis && typst watch main.typ
 #samenvatting[...]
 #acknowledgements[...]
 #curriculum-vitae(born: datetime(year: 1995, month: 3, day: 1))[...]
-#publications(("Journal articles": ("key1", "key2"), "Conference papers": ("key3",)))
+#publications(groups: ("Journal articles": ("key1", "key2"), "Conference papers": ("key3",)))
 ```
+
+### Your own publications
+
+Your own papers live in a second bibliography (via [alexandria](https://typst.app/universe/package/alexandria)). Give its contents to the theme with `publications-bib: read("publications.bib")` and cite them as `@pub:key`. They get their own labels, `[P1]`, `[P2]`, ..., numbered by date, and appear in `#publications()` rather than in the main `#bibliography`. Regular references keep `@key` and `[1]`, `[2]`, ...
 
 Metadata that the title page needs but you have not given yet (rector, defence
 date, birthplace) shows as a red `[placeholder]`.
@@ -106,6 +111,9 @@ Both themes accept these options, passed through to `thesis` in `src/core.typ`:
 | `degree`        | `"Doctor of Philosophy"`         | plain title page                                          |
 | `date`          | today                            | copyright year; plain title page without `defense`        |
 | `keywords`      | `()`                             | PDF metadata                                              |
+| `publications-bib` | `none`                        | contents of your own `.bib` (`read(...)`), or an array of them |
+| `publications-prefix` | `"pub:"`                   | citation prefix for your own papers                       |
+| `publications-style` | `auto` (IEEE with P-numbers)| CSL style of the own-publications list, as bytes or a built-in name |
 | `lang`          | `"en"`                           | `"nl"` for a Dutch thesis: Dutch fixed terms and hyphenation |
 | `paper`         | `(170mm, 240mm)`                 | page width and height                                     |
 | `margin`        | inside 24, outside 20, top 24, bottom 24 mm | two-sided margins                              |
@@ -130,14 +138,14 @@ Both themes accept these options, passed through to `thesis` in `src/core.typ`:
 | `front-matter`, `main-matter`, `appendix`, `back-matter` | `#show:` switches                           |
 | `acknowledgements[...]`                     | unnumbered chapter ("Dankwoord" in Dutch)                |
 | `curriculum-vitae(born:, birthplace:, photo:)[...]` | opens with "*Name* was born on *date* in *place*." |
-| `publications(groups, style:)`              | full citations from the thesis bibliography, numbered straight through |
+| `publications(groups:, title:, intro:)`     | every entry of `publications-bib`, labelled [P1], [P2], ...; `groups` maps subheadings to keys |
 | `format-date-nl(date, weekday:, time:)`     | "dinsdag 8 december 2026 om 16:00 uur"                   |
 | `accent[...]`, `highlight-box(title:)[...]` | emphasis in the theme colour                             |
 | `tue-logo(color:, full:)`                   | the TU/e logo in any colour                              |
 
 ## Known limitations
 
-- **One bibliography.** `publications` cites the works from the thesis bibliography, so they also appear there. Its default style is APA, because IEEE full citations start with the `[n]` label.
+- **Two bibliographies, not more.** The main `#bibliography` plus your own publications. Per-chapter reference lists are not supported yet.
 - **Check the TU/e wording.** The title and committee pages follow the TU/e doctorate regulations as of 2026. The doctorate office has the final say; `statement:` and the theme options let you adjust them.
 
 ## Example
@@ -161,4 +169,4 @@ Requirements:
 - `pdfinfo` and `pdftoppm` (poppler) for `check.sh`.
 - XCharter: `scripts/get-fonts.sh` puts it in `tmp/fonts`, which `check.sh` passes to Typst.
 
-The TU/e logo in `assets/` is a trademark of Eindhoven University of Technology. The MIT licence covers the code, not the logo.
+`assets/ieee-publications.csl` is adapted from the IEEE style of the [CSL project](https://citationstyles.org/) and stays under CC BY-SA 3.0. The TU/e logo in `assets/` is a trademark of Eindhoven University of Technology. The MIT licence covers the code, not the logo.

@@ -10,6 +10,7 @@
   #lorem(120)
 
   #lorem(90) Typst @typst is used throughout; see @ch:method and @fig:grid.
+  Our own work @pub:doe2022early @pub:roe2025late gets P-labels.
 
   == Background
   #lorem(200)
@@ -65,8 +66,8 @@
   #samenvatting[Dit is een korte Nederlandse samenvatting. #lorem(100)]
   #acknowledgements[#lorem(120)]
   #curriculum-vitae(born: datetime(year: 1990, month: 5, day: 17))[#lorem(80)]
-  #publications((
-    "Journal articles": ("doe2024journal",),
-    "Conference papers": ("doe2023conf",),
+  #publications(groups: (
+    "Journal articles": ("doe2024mid", "roe2025late"),
+    "Conference papers": ("doe2022early",),
   ))
 ]

@@ -8,6 +8,7 @@
 //  ("tue" or "plain") selects the chapter-opener and title-page layouts.
 // ============================================================================
 
+#import "@preview/alexandria:0.2.2": alexandria, load-bibliography
 #import "helpers.typ": _default-palette, term, thesis-config
 
 // True from `appendix` on: chapters and figures are numbered A, A.1, ...
@@ -262,6 +263,12 @@
   degree: "Doctor of Philosophy",
   date: datetime.today(),
   keywords: (),
+  // Own publications: a second bibliography, cited as @pub:key with labels
+  // [P1], [P2], ... and listed by `publications()`. Pass the file contents
+  // from your own document: `read("publications.bib")` (or an array).
+  publications-bib: none,
+  publications-prefix: "pub:",
+  publications-style: auto, // auto: IEEE with P-numbers, sorted by date
   // Layout
   lang: "en",
   paper: (170mm, 240mm),
@@ -293,6 +300,7 @@
       degree: degree,
       date: date,
     ),
+    pub-prefix: if publications-bib != none { publications-prefix },
   )
   let pal = cfg.palette
 
@@ -364,6 +372,25 @@
 
   set outline(indent: auto)
   set bibliography(style: "ieee")
+
+  // The own-publications bibliography, loaded up front so that @pub:key
+  // citations resolve wherever `publications()` is placed.
+  show: if publications-bib == none { it => it } else {
+    alexandria(prefix: publications-prefix, read: none)
+  }
+  if publications-bib != none {
+    let sources = if type(publications-bib) == array { publications-bib } else {
+      (publications-bib,)
+    }
+    load-bibliography(
+      sources.map(s => if type(s) == str { bytes(s) } else { s }),
+      prefix: publications-prefix,
+      full: true,
+      style: if publications-style == auto {
+        read("../assets/ieee-publications.csl", encoding: none)
+      } else { publications-style },
+    )
+  }
 
   thesis-config.update(cfg)
   body

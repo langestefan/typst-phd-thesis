@@ -1,7 +1,8 @@
 = Introduction <ch:introduction>
 
-Each `=` heading starts a chapter on a recto page. Cite with @doe2024journal
-and refer to @ch:conclusion, @fig:example or @eq:example.
+Each `=` heading starts a chapter on a recto page. Cite with @doe2024journal,
+cite your own work with @pub:doe2022early, and refer to @ch:conclusion,
+@fig:example or @eq:example.
 
 == Motivation
 

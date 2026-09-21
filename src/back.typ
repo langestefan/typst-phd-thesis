@@ -4,6 +4,7 @@
 //  language (English or Dutch) unless `title` is given.
 // ============================================================================
 
+#import "@preview/alexandria:0.2.2": get-bibliography, hayagriva
 #import "helpers.typ": format-date-en, format-date-nl, term, thesis-config
 
 #let _chapter(key, title) = context heading(
@@ -63,36 +64,64 @@
   }
 }
 
-/// The list of publications, as full citations numbered straight through.
-/// `groups` is an array of bibliography keys, or a dictionary of group title
-/// to keys, e.g. `("Journal articles": ("lange2024",), "Conference papers":
-/// ("lange2023",))`. The works come from the thesis' own `#bibliography`,
-/// so they are also listed there. `style` is the citation style of the
-/// entries; it must not print a label (IEEE full citations start with "[n]").
-#let publications(
-  groups,
-  title: auto,
-  intro: none,
-  style: "american-psychological-association",
-) = {
+/// The list of own publications: every entry of the theme's
+/// `publications-bib`, labelled [P1], [P2], ... as they are cited in the
+/// text (@pub:key). `groups` splits the list under subheadings: a dictionary
+/// of group title to keys (without the prefix), e.g. `("Journal articles":
+/// ("doe2024",), "Conference papers": ("doe2023",))`. Entries in no group
+/// follow at the end.
+#let publications(groups: auto, title: auto, intro: none) = {
   _chapter("publications", title)
   if intro != none {
     intro
     parbreak()
   }
-  let groups = if type(groups) == dictionary { groups.pairs() } else {
-    ((none, groups),)
-  }
-  let n = 1
-  for (group, keys) in groups {
-    if group != none {
-      heading(level: 2, numbering: none, outlined: false, group)
-    }
-    enum(
-      start: n,
-      spacing: 0.9em,
-      ..keys.map(k => cite(label(k), form: "full", style: style)),
+  context {
+    let prefix = thesis-config.get().pub-prefix
+    assert(
+      prefix != none,
+      message: "publications() lists the theme's `publications-bib`; pass it, e.g. `publications-bib: read(\"publications.bib\")`",
     )
-    n += keys.len()
+    let bib = get-bibliography(prefix)
+    let by-key = (:)
+    for e in bib.references { by-key.insert(e.key, e) }
+
+    // Label (for @pub:key links), [Pn] and the entry, with a hanging indent.
+    let entries(list) = grid(
+      columns: 2,
+      column-gutter: 0.65em,
+      row-gutter: 0.9em,
+      ..for e in list {
+        (
+          {
+            [#metadata(none)#label(prefix + e.key)]
+            if e.first-field != none { hayagriva.render(e.first-field) }
+          },
+          hayagriva.render(e.content),
+        )
+      },
+    )
+
+    if groups == auto {
+      entries(bib.references)
+    } else {
+      let done = ()
+      for (group, keys) in groups.pairs() {
+        for k in keys {
+          assert(
+            k in by-key,
+            message: "publications(): no entry '" + k + "' in publications-bib",
+          )
+        }
+        heading(level: 2, numbering: none, outlined: false, group)
+        entries(keys.map(k => by-key.at(k)))
+        done += keys
+      }
+      let rest = bib.references.filter(e => e.key not in done)
+      if rest.len() > 0 {
+        v(1em)
+        entries(rest)
+      }
+    }
   }
 }

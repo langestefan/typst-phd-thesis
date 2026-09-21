@@ -7,6 +7,7 @@
 #show: tue-theme.with(
   title: [Features],
   author: "Jane Doe",
+  publications-bib: read("publications.bib"),
   lang: "nl",
   draft: true,
 )
@@ -36,6 +37,10 @@
   assert.eq(counter(figure.where(kind: image)).at(<fig:app>), (1,))
   assert(thesis-appendix.at(<fig:app>))
   assert.eq(counter(heading).at(<app:deriv>).first(), 1)
+  // Own publications: every entry is listed (and so labelled), P-numbered.
+  for k in ("doe2022early", "doe2024mid", "roe2025late") {
+    assert.eq(query(label("pub:" + k)).len(), 1)
+  }
   // A Dutch document gets Dutch chapter supplements.
   assert.eq(query(<ch:intro>).first().supplement, [Hoofdstuk])
 }

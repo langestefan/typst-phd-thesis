@@ -11,6 +11,8 @@
   defense: none, // datetime(year: 2027, month: 6, day: 1, hour: 16, minute: 0, second: 0)
   rector: none, // check the name with the doctorate office
   keywords: ("keyword",),
+  // Your own papers: cite as @pub:key, labelled [P1], [P2], ...
+  publications-bib: read("publications.bib"),
   // draft: true,  // date stamp in the footer and line numbers
 )
 
@@ -51,7 +53,7 @@
 #samenvatting(include "chapters/samenvatting.typ")
 #acknowledgements[Thank you.]
 #curriculum-vitae(born: none)[Write your curriculum vitae here.]
-#publications((
-  "Journal articles": ("doe2024journal",),
-  "Conference papers": ("doe2023conf",),
+#publications(groups: (
+  "Journal articles": ("doe2024mid", "roe2025late"),
+  "Conference papers": ("doe2022early",),
 ))

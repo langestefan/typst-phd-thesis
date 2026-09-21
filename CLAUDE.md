@@ -4,7 +4,7 @@ This file guides Claude Code (claude.ai/code) when working in this repository.
 
 ## What this is
 
-`thesis-tue` is a Typst PhD thesis package (`@local/thesis-tue:0.1.0`, entrypoint `src/lib.typ`) with two themes, `tue-theme` and `plain-theme`. It has no `@preview` dependencies. It is installed by symlinking the repo to `~/.local/share/typst/packages/local/thesis-tue/0.1.0`. `template/` is what `typst init` copies. Sibling project with the same conventions: `../typst-beamer-tue`.
+`thesis-tue` is a Typst PhD thesis package (`@local/thesis-tue:0.1.0`, entrypoint `src/lib.typ`) with two themes, `tue-theme` and `plain-theme`. Its one `@preview` dependency is `alexandria` 0.2.2, for the second (own-publications) bibliography. It is installed by symlinking the repo to `~/.local/share/typst/packages/local/thesis-tue/0.1.0`. `template/` is what `typst init` copies. Sibling project with the same conventions: `../typst-beamer-tue`.
 
 ```bash
 scripts/get-fonts.sh                      # once: XCharter (TU/e theme font) into tmp/fonts
@@ -34,7 +34,7 @@ Keep the sources `typstyle`-clean. If you bump the pinned `typstyle`, reformat i
 - Figure and equation numbering functions read `counter(heading)` and `thesis-appendix` at `here()`. Anything that displays a figure number elsewhere (the lists of figures) must call `_in-chapter(n, "1.1", loc:)` with the figure's location, or it gets the list's chapter. The chapter show rule resets the figure (image, table, raw) and equation counters.
 - Typst warns once per unknown font family, even inside a fallback list, and `check.sh` fails on warnings. Keep the TU/e font list to XCharter plus a Typst-bundled fallback, and run `scripts/get-fonts.sh` before `check.sh`.
 - The chapter supplement ("Chapter"/"Hoofdstuk", "Appendix"/"Bijlage") is set with a show-set rule on level-1 headings so `@ref`s pick it up; sections keep Typst's localised "Section".
-- `publications` uses `cite(form: "full")` with APA by default: IEEE full citations start with the `[n]` label.
+- Own publications are a second bibliography via alexandria: `thesis` registers the `pub:` prefix (show rule) and loads `publications-bib` with `assets/ieee-publications.csl` (IEEE with `P` numbers, sorted by date; CC BY-SA, keep its header). `publications()` renders `get-bibliography` itself and must place a `label(prefix + key)` for every entry, or `@pub:key` citations fail with "label does not exist". The `.bib` contents come from the user's file (`read(...)` there), because `read` in the package resolves package-relative paths.
 - Themes pass the document body through `..args` to `thesis(...)`; do not turn them into `thesis.with(...)`, or `#show: tue-theme.with(...)` returns a function instead of content.
 - Typst on this machine cannot read or write `/tmp` (it has a private `/tmp`). Put scratch compiles under the repo's `tmp/`, which is gitignored.
 

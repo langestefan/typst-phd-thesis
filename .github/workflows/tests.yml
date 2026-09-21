@@ -31,6 +31,8 @@ jobs:
         uses: typst-community/setup-typst@v4
         with:
           typst-version: ${{ matrix.typst }}
+          # Caches the @preview packages imported here (alexandria).
+          cache-dependency-path: src/core.typ
 
       # poppler provides pdfinfo and pdftoppm for check.sh.
       - name: Install poppler
